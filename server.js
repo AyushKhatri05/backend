@@ -18,9 +18,9 @@ const PORT = process.env.PORT || 5000;
 // Security middleware
 app.use(helmet());
 
-// CORS configuration - FIXED for localhost:3000
+// CORS configuration - Allow Vercel frontend
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
     credentials: true
 }));
 
@@ -81,10 +81,15 @@ app.use((req, res) => {
     });
 });
 
-app.listen(PORT, () => {
-    console.log(`✅ Server running on http://localhost:${PORT}`);
-    console.log(`📡 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🔗 Frontend URL: http://localhost:3000`);
-    console.log(`🏥 Health check: http://localhost:${PORT}/health`);
-    console.log(`🧪 Test API: http://localhost:${PORT}/api/test`);
-});
+// Start server only if not in serverless environment
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`✅ Server running on http://localhost:${PORT}`);
+        console.log(`📡 Environment: ${process.env.NODE_ENV || 'development'}`);
+        console.log(`🔗 Frontend URL: http://localhost:3000`);
+        console.log(`🏥 Health check: http://localhost:${PORT}/health`);
+        console.log(`🧪 Test API: http://localhost:${PORT}/api/test`);
+    });
+}
+
+module.exports = app;
